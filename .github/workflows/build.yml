@@ -1,0 +1,33 @@
+name: Build Pager BIN
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+jobs:
+  compile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install arduino-cli
+        uses: arduino/setup-arduino-cli@v2
+      - name: Install ESP32 platform
+        run: |
+          arduino-cli config init
+          arduino-cli config add board_manager.additional_urls https://espressif.github.io/arduino-esp32/package_esp32_index.json
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32@3.3.3
+      - name: Install LilyGO libraries
+        run: |
+          mkdir -p "$HOME/Arduino/libraries"
+          git clone --depth=1 https://github.com/Xinyuan-LilyGO/LilyGoLib.git "$HOME/Arduino/libraries/LilyGoLib"
+          git clone --depth=1 https://github.com/Xinyuan-LilyGO/LilyGoLib-ThirdParty.git /tmp/LilyGoLib-ThirdParty
+          find /tmp/LilyGoLib-ThirdParty -mindepth 1 -maxdepth 1 -type d -exec cp -r '{}' "$HOME/Arduino/libraries/" \;
+      - name: Compile app
+        run: |
+          arduino-cli compile --fqbn "esp32:esp32:tlora_pager:Revision=Radio_SX1262" --libraries "$HOME/Arduino/libraries" --output-dir ./output ./RobotEyes_Pager
+          ls -lh output
+      - name: Downloadable BIN
+        uses: actions/upload-artifact@v4
+        with:
+          name: RobotEyes-ESP32S3-BIN
+          path: output/*.bin
