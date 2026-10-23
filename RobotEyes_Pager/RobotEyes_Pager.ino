@@ -87,11 +87,11 @@ void setup() {
   imuReady = true; // Driver initialization happened in instance.begin(); read if available.
 #endif
   if (imuReady) {
-    instance.sensor.configure(SENSOR_ID_ACC_PASS, 50);
+   // instance.sensor.configure(SENSOR_ID_ACC_PASS, 50);
     delay(160);
     instance.sensor.update();
     float z = 0;
-    instance.sensor.getAccelerometer(zeroX, zeroY, z);
+   // instance.sensor.getAccelerometer(zeroX, zeroY, z);
   }
   lastAction = millis();
   nextBlink = lastAction + 2000;
@@ -120,7 +120,7 @@ void loop() {
     lastImu = now;
     instance.sensor.update();
     float x = 0, y = 0, z = 0;
-    instance.sensor.getAccelerometer(x, y, z);
+    // instance.sensor.getAccelerometer(x, y, z);
     float tx = clip((x - zeroX) * 0.20f, -1, 1);
     float ty = clip((y - zeroY) * 0.20f, -1, 1);
     if (fabsf(tx) + fabsf(ty) > 0.18f) {
